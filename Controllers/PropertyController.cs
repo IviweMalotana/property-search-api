@@ -14,24 +14,53 @@ namespace PropertySearchAPI.Controllers
         private readonly OpenAIIntentService _intent;
         private readonly Property24ScraperService _scraper;
         private readonly OxylabsFetchService _fetch;
+        private readonly IConfiguration _config;
 
         public PropertyController(
             SearchService search,
             CsvAreaService csv,
             OpenAIIntentService intent,
             Property24ScraperService scraper,
-            OxylabsFetchService fetch)
+            OxylabsFetchService fetch,
+            IConfiguration config)
         {
             _search = search;
             _csv = csv;
             _intent = intent;
             _scraper = scraper;
             _fetch = fetch;
+            _config = config;
+        }
+
+        // ------------------------------------------------
+        // DEBUG CONFIG (NEW)
+        // ------------------------------------------------
+
+        [HttpGet("debug-config")]
+        public IActionResult DebugConfig()
+        {
+            Console.WriteLine("========== DEBUG CONFIG ==========");
+
+            var openai = _config["ApiKeys:OpenAI"];
+            var oxyUser = _config["ApiKeys:OxylabsUsername"];
+            var oxyPass = _config["ApiKeys:OxylabsPassword"];
+
+            Console.WriteLine($"OpenAI Loaded: {!string.IsNullOrEmpty(openai)}");
+            Console.WriteLine($"Oxylabs Username Loaded: {!string.IsNullOrEmpty(oxyUser)}");
+            Console.WriteLine($"Oxylabs Password Loaded: {!string.IsNullOrEmpty(oxyPass)}");
+
+            return Ok(new
+            {
+                openai_loaded = !string.IsNullOrEmpty(openai),
+                oxylabs_username_loaded = !string.IsNullOrEmpty(oxyUser),
+                oxylabs_password_loaded = !string.IsNullOrEmpty(oxyPass)
+            });
         }
 
         // ------------------------------------------------
         // BASIC TEST
         // ------------------------------------------------
+
         [HttpGet("search")]
         public IActionResult Search(string query)
         {
@@ -49,6 +78,7 @@ namespace PropertySearchAPI.Controllers
         // ------------------------------------------------
         // CSV AREAS
         // ------------------------------------------------
+
         [HttpGet("areas")]
         public IActionResult GetAreas()
         {
@@ -64,6 +94,7 @@ namespace PropertySearchAPI.Controllers
         // ------------------------------------------------
         // FIND SUBURB
         // ------------------------------------------------
+
         [HttpGet("find-suburb")]
         public IActionResult FindSuburb(string suburb)
         {
@@ -78,6 +109,7 @@ namespace PropertySearchAPI.Controllers
         // ------------------------------------------------
         // FULL PROPERTY PIPELINE
         // ------------------------------------------------
+
         [HttpGet("intent")]
         public async Task<IActionResult> ExtractIntent(string query)
         {
@@ -86,8 +118,6 @@ namespace PropertySearchAPI.Controllers
             Console.WriteLine($"User Query: {query}");
             Console.WriteLine("==============================================");
 
-            // STEP 1: INTENT
-            Console.WriteLine("STEP 1: Parsing intent...");
             var intent = await _intent.ExtractIntent(query);
 
             Console.WriteLine($"Listing Type: {intent.listing_type}");
@@ -98,7 +128,6 @@ namespace PropertySearchAPI.Controllers
             if (intent.areas == null || intent.areas.Count == 0)
                 return Ok(new { error = "No areas detected" });
 
-            // STEP 2: CSV LOOKUP
             Console.WriteLine("STEP 2: CSV lookup...");
             var suburb = intent.areas.First();
 
@@ -112,7 +141,6 @@ namespace PropertySearchAPI.Controllers
 
             Console.WriteLine($"CSV match: {areaRow.city} - {areaRow.suburb}");
 
-            // STEP 3: BUILD PROPERTY24 URL
             Console.WriteLine("STEP 3: Building Property24 URL...");
 
             string basePath = intent.listing_type == "for-sale"
@@ -139,10 +167,6 @@ namespace PropertySearchAPI.Controllers
                 propertyUrl += "?sp=" + string.Join("%26", parameters);
 
             Console.WriteLine($"Property24 URL: {propertyUrl}");
-
-            // ------------------------------------------------
-            // STEP 4: SCRAPE LISTINGS
-            // ------------------------------------------------
 
             List<object> listings = new();
 
@@ -225,7 +249,6 @@ namespace PropertySearchAPI.Controllers
                 }
 
                 page++;
-
                 await Task.Delay(2000);
             }
 
@@ -245,6 +268,7 @@ namespace PropertySearchAPI.Controllers
         // ------------------------------------------------
         // DEBUG FETCH
         // ------------------------------------------------
+
         [HttpGet("fetch-html")]
         public async Task<IActionResult> FetchHtml(string url)
         {
