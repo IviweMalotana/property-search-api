@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy ASP.Net Core app to Azure Web App - propcompile-api
+name: Build and deploy ASP.Net Core app to Azure Web App - property-search-api
 
 on:
   push:
@@ -38,29 +38,18 @@ jobs:
   deploy:
     runs-on: windows-latest
     needs: build
-    permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
-
+    
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: .net-app
       
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_C48C79E307624A66811360FBC251076F }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_DF4F6CD107E746E0B8E6A6C7731F216E }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_5328B8DCB97E416FAFD4E90B7FED2ABA }}
-
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'propcompile-api'
+          app-name: 'property-search-api'
           slot-name: 'Production'
           package: .
-
-          
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_76C51FB9A17E4BE2AEC64F82B840CAD2 }}
