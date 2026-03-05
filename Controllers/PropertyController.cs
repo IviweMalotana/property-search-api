@@ -32,31 +32,7 @@ namespace PropertySearchAPI.Controllers
             _config = config;
         }
 
-        // ------------------------------------------------
-        // DEBUG CONFIG (NEW)
-        // ------------------------------------------------
-
-        [HttpGet("debug-config")]
-        public IActionResult DebugConfig()
-        {
-            Console.WriteLine("========== DEBUG CONFIG ==========");
-
-            var openai = _config["ApiKeys:OpenAI"];
-            var oxyUser = _config["ApiKeys:OxylabsUsername"];
-            var oxyPass = _config["ApiKeys:OxylabsPassword"];
-
-            Console.WriteLine($"OpenAI Loaded: {!string.IsNullOrEmpty(openai)}");
-            Console.WriteLine($"Oxylabs Username Loaded: {!string.IsNullOrEmpty(oxyUser)}");
-            Console.WriteLine($"Oxylabs Password Loaded: {!string.IsNullOrEmpty(oxyPass)}");
-
-            return Ok(new
-            {
-                openai_loaded = !string.IsNullOrEmpty(openai),
-                oxylabs_username_loaded = !string.IsNullOrEmpty(oxyUser),
-                oxylabs_password_loaded = !string.IsNullOrEmpty(oxyPass)
-            });
-        }
-
+     
         // ------------------------------------------------
         // BASIC TEST
         // ------------------------------------------------

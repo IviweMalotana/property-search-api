@@ -23,22 +23,4 @@ app.UseHttpsRedirection();
 
 app.MapControllers();
 
-app.Use(async (context, next) =>
-{
-    try
-    {
-        await next();
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine("=================================");
-        Console.WriteLine("GLOBAL ERROR");
-        Console.WriteLine(ex.ToString());
-        Console.WriteLine("=================================");
-
-        context.Response.StatusCode = 500;
-        await context.Response.WriteAsync(ex.ToString());
-    }
-});
-
 app.Run();
