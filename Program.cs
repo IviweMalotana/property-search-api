@@ -14,6 +14,7 @@ builder.Services.AddSingleton<OpenAIIntentService>();
 builder.Services.AddSingleton<Property24ScraperService>();
 builder.Services.AddHttpClient<OxylabsFetchService>();
 
+// CORS POLICY
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
@@ -30,6 +31,9 @@ var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI();
+
+// IMPORTANT: enable CORS
+app.UseCors("AllowAll");
 
 app.UseHttpsRedirection();
 
