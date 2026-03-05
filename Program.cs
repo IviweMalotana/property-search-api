@@ -14,6 +14,18 @@ builder.Services.AddSingleton<OpenAIIntentService>();
 builder.Services.AddSingleton<Property24ScraperService>();
 builder.Services.AddHttpClient<OxylabsFetchService>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy =>
+        {
+            policy
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        });
+});
+
 var app = builder.Build();
 
 app.UseSwagger();
