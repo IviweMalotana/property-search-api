@@ -173,6 +173,24 @@ namespace PropertySearchAPI.Controllers
             });
         }
 
+        [HttpGet("debug-image-path")]
+        public IActionResult DebugPath()
+        {
+            var path = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "Data",
+                "Images",
+                "Darla",
+                "Frosted.png"
+            );
+
+            return Ok(new
+            {
+                path,
+                exists = System.IO.File.Exists(path)
+            });
+        }
+
         // ------------------------------------------------
         // DEBUG FETCH
         // ------------------------------------------------
