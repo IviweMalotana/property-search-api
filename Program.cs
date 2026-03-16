@@ -7,12 +7,19 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Existing services
 builder.Services.AddSingleton<SearchService>();
 builder.Services.AddSingleton<CsvAreaService>();
+
 builder.Services.AddHttpClient();
+
 builder.Services.AddSingleton<OpenAIIntentService>();
 builder.Services.AddSingleton<Property24ScraperService>();
+
 builder.Services.AddHttpClient<OxylabsFetchService>();
+
+// NEW IMAGE SERVICE
+builder.Services.AddHttpClient<OpenAIImageService>();
 
 // CORS POLICY
 builder.Services.AddCors(options =>
